@@ -324,37 +324,65 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">笑清</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
-    </span>
-      <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">0k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1 分钟</span>
-</div>
-  <div class="powered-by">powered by Hexo and Next
-  </div>
 
-<div class="powered-by">
-<i class="fa fa-user-md"></i>
-<span id="busuanzi_container_site_uv">
-  本站总访客数:<span id="busuanzi_value_site_uv"></span>&nbsp;&nbsp;| 
-</span>
-<span id="busuanzi_container_site_pv">
-    &nbsp;本站总访问量<span id="busuanzi_value_site_pv"></span>次
-</span>
-</div>
+<!--修改-->
+
+<!--添加网站运行时间 -->
+<script type="text/javascript">
+    function show_site_runtime(){
+    window.setTimeout("show_site_runtime()",1000); // 每秒运行一次函数
+    X=new Date("10/23/2021 00:00:00"); //在这里修改你的建站时间
+    Y=new Date();
+    T=(Y.getTime()-X.getTime()); // 获取当前时间与指定时间之间的时间间隔（ms）    
+    i=24*60*60*1000;
+    d=T/i;
+    D=Math.floor(d); // 计算天数并向下取整
+    h=(d-D)*24;
+    H=Math.floor(h); // 计算剩余不足一天的小时数并向下取整
+    m=(h-H)*60;
+    M=Math.floor(m); // 计算剩余不足一小时的分钟数并向下取整
+    s=(m-M)*60
+    S=Math.floor(s); // 计算剩余不足一分钟的秒数并向下取整
+    site_runtime.innerHTML= D + " 天 " + H + " 小时 " + M + " 分 " + S + " 秒 "
+    }
+    show_site_runtime();
+</script>
+<p>>w< 本博客已诞生<span id="site_runtime" style="color: #24a0f0;"></span>>w<</p>
+<!--添加网站运行时间 -->
+
+
+
+<!--修改-->
+
+
+
+
 </div>
 
 
 
 
         
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -368,6 +396,8 @@
   </div>
 
   
+  
+  <script color='238,99,33' opacity='1' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/pjax/pjax.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
@@ -443,6 +473,7 @@ window.addEventListener('pjax:success', () => {
 </script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
 
 
   
@@ -467,5 +498,5 @@ window.addEventListener('pjax:success', () => {
   
 
     </div>
-</body>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/shizuku.model.json"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":true},"rect":"opacity:0.7","log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
