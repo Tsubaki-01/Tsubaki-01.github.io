@@ -1169,7 +1169,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #fab517;
+  background: #ff2a25;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -1513,6 +1513,16 @@ pre .javascript .function {
     opacity: 0.8;
   }
 }
+.reading-progress-bar {
+  background: #009966;
+  display: block;
+  height: 6px;
+  left: 0;
+  position: fixed;
+  width: 0;
+  z-index: 1500;
+  bottom: 0;
+}
 .post-body {
   font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
   overflow-wrap: break-word;
@@ -1545,7 +1555,7 @@ pre .javascript .function {
   text-align: center;
 }
 .use-motion .post-block {
-  opacity: 0;
+  opacity: 0.5;
   margin-top: 60px;
   margin-bottom: 60px;
   padding: 25px;
@@ -1557,13 +1567,13 @@ pre .javascript .function {
   opacity: 0;
 }
 .use-motion .post-header {
-  opacity: 0;
+  opacity: 0.5;
 }
 .use-motion .post-body {
-  opacity: 0;
+  opacity: 0.5;
 }
 .use-motion .collection-header {
-  opacity: 0;
+  opacity: 0.5;
 }
 .posts-collapse {
   margin-left: 35px;
@@ -2362,14 +2372,17 @@ embed {
 body {
   background: url("/images/background.png");
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: no-fixed;
   background-position: 50% 50%;
   background-size: 100% 100%;
+}
+* {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E6%96%87%E4%BB%B6.ico"), auto !important;
 }
 body {
   background: url("/images/background.png");
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: no-fixed;
   background-position: 50% 50%;
   background-size: 100% 100%;
 }
@@ -2384,4 +2397,7 @@ body {
 }
 .popup {
   opacity: 0.8;
+}
+* {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E6%96%87%E4%BB%B6.ico"), auto !important;
 }
