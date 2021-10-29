@@ -1169,7 +1169,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #67d08f;
+  background: #8a1aff;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2376,16 +2376,6 @@ body {
   background-position: 50% 50%;
   background-size: 100% 100%;
 }
-* {
-  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E6%96%87%E4%BB%B6.ico"), auto !important;
-}
-body {
-  background: url("/images/background.png");
-  background-repeat: no-repeat;
-  background-attachment: no-fixed;
-  background-position: 50% 50%;
-  background-size: 100% 100%;
-}
 .content-wrap {
   opacity: 1;
 }
@@ -2398,6 +2388,46 @@ body {
 .popup {
   opacity: 0.8;
 }
-* {
-  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%87%E7%82%B9%E5%87%BB%E6%96%87%E4%BB%B6.ico"), auto !important;
+/** 鼠标样式 开始**/
+/** 普通指针样式**/
+body {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%872.ico"), default;
 }
+/** 链接指针样式**/
+a:hover {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/pointer.ico"), pointer;
+}
+/** 鼠标样式 结束**/
+body {
+  background: url("/images/background.png");
+  background-repeat: no-repeat;
+  background-attachment: no-fixed;
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+}
+.main-inner {
+  background: rgba(255,255,255,0.75);
+}
+.content-wrap {
+  opacity: 1;
+}
+文章字体透明度,
+.sidebar {
+  opacity: 0.85;
+}
+.header-inner {
+  background: rgba(255,255,255,0.73);
+}
+.popup {
+  opacity: 1;
+}
+/** 鼠标样式 开始**/
+/** 普通指针样式**/
+body {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%872.ico"), default;
+}
+/** 链接指针样式**/
+a:hover {
+  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/pointer.ico"), pointer;
+}
+/** 鼠标样式 结束**/
