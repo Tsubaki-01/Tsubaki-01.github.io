@@ -27,16 +27,16 @@
 <meta property="og:site_name" content="My little blog">
 <meta property="og:description" content="写在前面在介绍使用Hexo搭建个人博客所必备的环境之前，先说明我们为什么采用Hexo框架。 首先，搭建个人博客采用框架的选择其实很丰富，有Hexo、Hugo和WordPress等。但如果是搭建个人博客，Hexo在开源内容方面是较为丰富的，各种主题插件资源能够在GitHub等网站上找到。 另一方面是Hexo框架用户基数大，遇到的各种问题可以很容易在网上找到解答，教程也是较多的。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/Nodejs.png">
-<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/nodetest.png">
-<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/Git.png">
-<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/gitversion.png">
+<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/Nodejs.png?raw=true">
+<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/nodetest.png?raw=true">
+<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/Git.png?raw=true">
+<meta property="og:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/gitversion.png?raw=true">
 <meta property="article:published_time" content="2021-11-01T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-11-04T15:57:23.025Z">
+<meta property="article:modified_time" content="2021-11-05T02:28:51.335Z">
 <meta property="article:author" content="笑清">
 <meta property="article:tag" content="Hexo Building">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/Nodejs.png">
+<meta name="twitter:image" content="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/Nodejs.png?raw=true">
 
 <link rel="canonical" href="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/">
 
@@ -212,7 +212,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-04 23:57:23" itemprop="dateModified" datetime="2021-11-04T23:57:23+08:00">2021-11-04</time>
+                <time title="修改时间：2021-11-05 10:28:51" itemprop="dateModified" datetime="2021-11-05T10:28:51+08:00">2021-11-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -274,14 +274,14 @@
 <p>Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。Node.js 使用了一个事件驱动、非阻塞式 I/O 的模型,使其轻量又高效。Node.js 的包管理器 npm,是全球最大的开源库生态系统。(官网介绍)</p>
 <p>总之，我们需要Node.js这个工具以及其包管理器npm，而具体的原理在上面的文件中有专业说明，鉴于我也是一知半解，就不在此赘述。😣</p>
 <h3 id="Node-js下载"><a href="#Node-js下载" class="headerlink" title="Node.js下载"></a>Node.js下载</h3><p>在Node.js官网的download选项中选择与自身计算机相匹配的系统版本下载。</p>
-<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/Nodejs.png"></p>
+<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/Nodejs.png?raw=true"></p>
 <h3 id="Node-js安装"><a href="#Node-js安装" class="headerlink" title="Node.js安装"></a>Node.js安装</h3><p>打开下载好的安装包，除了在安装路径选项处修改默认的C盘路径到自己想要的硬盘路径，一路点击next，完成安装。</p>
 <p>为了防止不可知的错误，我们要对node测试是否安装成功。</p>
 <p>按下【win+R】打开运行对话框，输入【cmd】进入命令行，依次输入</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
 
 <p>若Nodejs安装成功，将会显示当前版本。(这里的cnpm会在后面介绍)</p>
-<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/nodetest.png"></p>
+<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/nodetest.png?raw=true"></p>
 <h3 id="Node环境配置"><a href="#Node环境配置" class="headerlink" title="Node环境配置"></a>Node环境配置</h3><p>成功安装完Node.js后，在所选路径中会包含一个名称为“node_modules”的文件夹以及一些文件。这时我们如果要保证之后所添加的插件不被默认安装在C盘，我们需要修改我们的安装路径。</p>
 <p>首先，在nodejs文件夹中新建两个文件夹，文件夹名分别为“node_cache”与”node_global”。</p>
 <p>创建完两个文件夹后，在命令行中输入以下命令：</p>
@@ -305,14 +305,14 @@
 </blockquote>
 <p>Git是世界上最优秀的开源分布式版本控制系统之一，我们需要它来帮助我们管理博客项目。</p>
 <h3 id="Git下载"><a href="#Git下载" class="headerlink" title="Git下载"></a>Git下载</h3><p>在Git官网下载对应版本的Git，可以看到，在官网的右侧会自动检测你的系统，推荐相应版本安装。如果与你的计算机版本有出入，可以点击download来选择安装对应版本。</p>
-<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/Git.png"></p>
+<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/Git.png?raw=true"></p>
 <h3 id="Git安装"><a href="#Git安装" class="headerlink" title="Git安装"></a>Git安装</h3><p>打开下载好的安装包，除了在安装路径选项处修改默认的C盘路径到自己想要的硬盘路径，一路点击next，完成安装。</p>
 <p>安装完成后，在开始菜单可以看到Git的三个启动项，分别为Git Bash、Git Cmd、Git Gui，他们也同时被绑定到我们的右键菜单中（可以修改右键菜单，只留下Git Bash）。我们一般使用Git Bash。</p>
 <p>在xmd命令行输入</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git --version</span><br></pre></td></tr></table></figure>
 
 <p>查看git版本号以检查是否安装成功。</p>
-<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/images/hexoenvironment/gitversion.png"></p>
+<p><img src="https://github.com/Tsubaki-01/Tsubaki-01.github.io/blob/main/images/hexoenvironment/gitversion.png?raw=true"></p>
 <blockquote>
 <p>至此，安装Hexo框架之前的准备工作大抵完成，下一篇文章将介绍如何安装Hexo框架并将Hexo框架连接到GitHub的repository以完成Hexo+GitHub.io博客的搭建。</p>
 </blockquote>
@@ -345,7 +345,7 @@
   <p><span>本文标题:</span><a href="/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/">Hexo博客环境搭建</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 笑清 的个人博客">笑清</a></p>
   <p><span>发布时间:</span>2021年11月02日 - 00:11</p>
-  <p><span>最后更新:</span>2021年11月04日 - 23:11</p>
+  <p><span>最后更新:</span>2021年11月05日 - 10:11</p>
   <p><span>原始链接:</span><a href="/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/" title="Hexo博客环境搭建">https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/"  aria-label="复制成功！"></i></span>
   </p>
