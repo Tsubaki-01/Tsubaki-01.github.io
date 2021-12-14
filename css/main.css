@@ -1163,7 +1163,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #280f00;
+  background: #fff6c2;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2398,7 +2398,7 @@ a:hover {
 body {
   background: url("/images/background.png");
   background-repeat: no-repeat;
-  background-attachment: no-fixed;
+  background-attachment: fixed;
   background-position: 50% 50%;
   background-size: 100% 100%;
 }
@@ -2415,11 +2415,11 @@ body {
 /** 鼠标样式 开始**/
 /** 普通指针样式**/
 body {
-  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/%E9%BC%A0%E6%A0%872.ico"), default;
+  cursor: url("/images/shubiao.ico"), default;
 }
 /** 链接指针样式**/
 a:hover {
-  cursor: url("http://r1k9uuq9d.hn-bkt.clouddn.com/pointer.ico"), pointer;
+  cursor: url("/images/shubiaopointer.ico"), pointer;
 }
 /** 鼠标样式 结束**/
 .sidebar {
