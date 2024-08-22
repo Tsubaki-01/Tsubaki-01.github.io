@@ -1,0 +1,32 @@
+Node.js下载：【它让JavaScript成为与PHP、Python、Perl、Ruby等服务端语言平起平坐的脚本语言。】
+安装教程：https://www.cnblogs.com/liuqiyun/p/8133904.html
+ 
+Git下载：https://github.com/git-for-windows/git/releases/download/v2.11.0.windows.3/Git-2.11.0.3-64-bit.exe【Git是一个开源的分布式版本控制系统，可以有效、高速地处理从很小到非常大的项目版本管理】
+安装教程：https://www.cnblogs.com/xueweisuoyong/p/11914045.html
+ 
+node -v
+npm -v
+git --version
+ 
+Hexo下载：npm install hexo-cli -g
+ 
+hexo -v
+ 
+ 
+github账号注册：https://www.bilibili.com/read/cv5107169/
+ 
+ 
+ 
+生成ssh：ssh-keygen -t rsa -C "邮件地址"
+测试ssh是否绑定成功：ssh -T git@github.com 
+ 
+npm install -g hexo #安装hexo
+hexo init #初始化hexo博客
+hexo s # 启动服务
+ 
+deploy:
+  type:
+  repository: 
+  branch: 
+ 
+安装hexo-deployer-git自动部署发布工具：npm install hexo-deployer-git --save
