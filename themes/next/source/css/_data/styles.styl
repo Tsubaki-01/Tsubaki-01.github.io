@@ -1,0 +1,45 @@
+//背景图片
+body {
+    background:url(/images/background.png); // 可以是路径也可以是链接
+    background-repeat: no-repeat; // 不重复
+    background-attachment:fixed; // 固定住背景图片
+    background-position:50% 50%; // 图片位置：居中
+    background-size: 100% 100%; // 图片长宽扩充为100%
+}
+//透明度
+
+// 修改内容区域的透明度
+.main-inner {
+  background: rgba(255,255,255,0.75);
+}
+
+.content-wrap {
+  opacity: 1;
+}文章字体透明度
+
+.header-inner {
+  background: rgba(255,255,255,0.8);
+}//head
+
+
+/** 鼠标样式 开始**/ 
+/** 普通指针样式**/ 
+body {
+cursor: url(/images/shubiao.ico), default;
+}
+ 
+/** 链接指针样式**/ 
+a:hover{cursor: url(/images/shubiaopointer.ico), pointer;}
+ 
+/** 鼠标样式 结束**/
+
+//侧边栏
+.sidebar {
+    
+    opacity: 1;
+    background: #d4dcda;
+    padding-left: 6px;
+}
+.sidebar-inner {
+    margin-top: 0px;
+}
