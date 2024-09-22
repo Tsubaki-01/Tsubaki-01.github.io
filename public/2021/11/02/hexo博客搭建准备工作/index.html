@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-center-circle.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"tsubaki-01.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="写在前面在介绍使用Hexo搭建个人博客所必备的环境之前，先说明我们为什么采用Hexo框架。 首先，搭建个人博客采用框架的选择其实很丰富，有Hexo、Hugo和WordPress等。但如果是搭建个人博客，Hexo在开源内容方面是较为丰富的，各种主题插件资源能够在GitHub等网站上找到。 另一方面是Hexo框架用户基数大，遇到的各种问题可以很容易在网上找到解答，教程也是较多的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo博客-环境搭建">
+<meta property="og:url" content="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/index.html">
+<meta property="og:site_name" content="My little blog">
+<meta property="og:description" content="写在前面在介绍使用Hexo搭建个人博客所必备的环境之前，先说明我们为什么采用Hexo框架。 首先，搭建个人博客采用框架的选择其实很丰富，有Hexo、Hugo和WordPress等。但如果是搭建个人博客，Hexo在开源内容方面是较为丰富的，各种主题插件资源能够在GitHub等网站上找到。 另一方面是Hexo框架用户基数大，遇到的各种问题可以很容易在网上找到解答，教程也是较多的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tsubaki-01.github.io/images/hexoenvironment/Nodejs.png">
+<meta property="og:image" content="https://tsubaki-01.github.io/images/hexoenvironment/nodetest.png">
+<meta property="og:image" content="https://tsubaki-01.github.io/images/hexoenvironment/Git.png">
+<meta property="og:image" content="https://tsubaki-01.github.io/images/hexoenvironment/gitversion.png">
+<meta property="article:published_time" content="2021-11-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-09-10T04:34:43.724Z">
+<meta property="article:author" content="笑清">
+<meta property="article:tag" content="Hexo Building">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tsubaki-01.github.io/images/hexoenvironment/Nodejs.png">
+
+<link rel="canonical" href="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Hexo博客-环境搭建 | My little blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">My little blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="笑清">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="My little blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Hexo博客-环境搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-02 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-02T00:00:00+08:00">2021-11-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-09-10 12:34:43" itemprop="dateModified" datetime="2024-09-10T12:34:43+08:00">2024-09-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hexo-Building/" itemprop="url" rel="index"><span itemprop="name">Hexo Building</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><p>在介绍使用Hexo搭建个人博客所必备的环境之前，先说明我们为什么采用Hexo框架。</p>
+<p>首先，搭建个人博客采用框架的选择其实很丰富，有Hexo、Hugo和WordPress等。但如果是搭建个人博客，Hexo在开源内容方面是较为丰富的，各种主题插件资源能够在GitHub等网站上找到。</p>
+<p>另一方面是Hexo框架用户基数大，遇到的各种问题可以很容易在网上找到解答，教程也是较多的。</p>
+<span id="more"></span>
+
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1mU4y1j72n?from=search&seid=11261496233121285254&spm_id_from=333.337.0.0">本篇文章参考</a></p>
+</blockquote>
+<h2 id="Node-js配置"><a href="#Node-js配置" class="headerlink" title="Node.js配置"></a>Node.js配置</h2><blockquote>
+<p><a target="_blank" rel="noopener" href="https://nodejs.org/en/download/">Node.js官网安装</a></p>
+<p><a target="_blank" rel="noopener" href="http://nodejs.cn/">Node.js中文网</a></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.sitepoint.com/node-js-is-the-new-black/">What is Node.js</a></p>
+</blockquote>
+</blockquote>
+<p>Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。Node.js 使用了一个事件驱动、非阻塞式 I&#x2F;O 的模型,使其轻量又高效。Node.js 的包管理器 npm,是全球最大的开源库生态系统。(官网介绍)</p>
+<p>总之，我们需要Node.js这个工具以及其包管理器npm，而具体的原理在上面的文件中有专业说明，鉴于我也是一知半解，就不在此赘述。😣</p>
+<h3 id="Node-js下载"><a href="#Node-js下载" class="headerlink" title="Node.js下载"></a>Node.js下载</h3><p>在Node.js官网的download选项中选择与自身计算机相匹配的系统版本下载。</p>
+<p><img src="/images/hexoenvironment/Nodejs.png"></p>
+<h3 id="Node-js安装"><a href="#Node-js安装" class="headerlink" title="Node.js安装"></a>Node.js安装</h3><p>打开下载好的安装包，除了在安装路径选项处修改默认的C盘路径到自己想要的硬盘路径，一路点击next，完成安装。</p>
+<p>为了防止不可知的错误，我们要对node测试是否安装成功。</p>
+<p>按下【win+R】打开运行对话框，输入【cmd】进入命令行，依次输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
+
+<p>若Nodejs安装成功，将会显示当前版本。(这里的cnpm会在后面介绍)</p>
+<p><img src="/images/hexoenvironment/nodetest.png"></p>
+<h3 id="Node环境配置"><a href="#Node环境配置" class="headerlink" title="Node环境配置"></a>Node环境配置</h3><p>成功安装完Node.js后，在所选路径中会包含一个名称为“node_modules”的文件夹以及一些文件。这时我们如果要保证之后所添加的插件不被默认安装在C盘，我们需要修改我们的安装路径。</p>
+<p>首先，在nodejs文件夹中新建两个文件夹，文件夹名分别为“node_cache”与”node_global”。</p>
+<p>创建完两个文件夹后，在命令行中输入以下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm config set prefix &quot;...\nodejs\node_global&quot;</span><br><span class="line">npm config set cache &quot;...\nodejs\node_cache&quot;</span><br></pre></td></tr></table></figure>
+
+<p>接下来需要修改环境变量&nbsp; “此电脑-&gt;属性-&gt;高级系统设置-&gt;环境变量”&nbsp; 用户变量中选择“Path”，点击“编辑”，“新建”，键入你刚刚建立的node_global文件夹路径，确定，完成环境配置。</p>
+<h3 id="cnpm安装"><a href="#cnpm安装" class="headerlink" title="cnpm安装"></a>cnpm安装</h3><p>由于国内墙的存在，使用npm下载安装插件时经常会出现连接超时的情况，这时，我们可以安装淘宝cnpm镜像来解决这个问题。而在之后的命令中，若npm命令失败，可以采用cnpm命令进行替代。</p>
+<p>在cmd命令行中输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g cnpm -registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<p>等待安装结束后输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cnpm -v</span><br></pre></td></tr></table></figure>
+
+<p>查看cnpm版本号。若出现上方截图中类似情况，则cnpm安装成功。</p>
+<blockquote>
+<p>至此，Nodejs配置完成，其中最为重要的是环境变量的设置。这个问题解决方法很多，这里只是列出了一种在我个人电脑上可以实现的方法，若出现不同情况，可以在搜索引擎与论坛上寻找答案。</p>
+<p>另外，对于cnpm的安装，大家可以在cmd命令行中键入”npm install express -g”、”cnpm install express -g”等安装实例来检测npm或cnpm是否安装成功。</p>
+</blockquote>
+<h2 id="Git配置"><a href="#Git配置" class="headerlink" title="Git配置"></a>Git配置</h2><blockquote>
+<p><a target="_blank" rel="noopener" href="https://git-scm.com/">Git官网</a> </p>
+</blockquote>
+<p>Git是世界上最优秀的开源分布式版本控制系统之一，我们需要它来帮助我们管理博客项目。</p>
+<h3 id="Git下载"><a href="#Git下载" class="headerlink" title="Git下载"></a>Git下载</h3><p>在Git官网下载对应版本的Git，可以看到，在官网的右侧会自动检测你的系统，推荐相应版本安装。如果与你的计算机版本有出入，可以点击download来选择安装对应版本。</p>
+<p><img src="/images/hexoenvironment/Git.png"></p>
+<h3 id="Git安装"><a href="#Git安装" class="headerlink" title="Git安装"></a>Git安装</h3><p>打开下载好的安装包，除了在安装路径选项处修改默认的C盘路径到自己想要的硬盘路径，一路点击next，完成安装。</p>
+<p>安装完成后，在开始菜单可以看到Git的三个启动项，分别为Git Bash、Git Cmd、Git Gui，他们也同时被绑定到我们的右键菜单中（可以修改右键菜单，只留下Git Bash）。我们一般使用Git Bash。</p>
+<p>在cmd命令行输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git --version</span><br></pre></td></tr></table></figure>
+
+<p>查看git版本号以检查是否安装成功。</p>
+<p><img src="/images/hexoenvironment/gitversion.png"></p>
+<blockquote>
+<p>至此，安装Hexo框架之前的准备工作大抵完成，下一篇文章将介绍如何安装Hexo框架并将Hexo框架连接到GitHub的repository以完成Hexo+GitHub.io博客的搭建。</p>
+</blockquote>
+
+    </div>
+
+<!--文章结束提示-->
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+  
+</div>
+<!--文章结束提示-->
+
+<!--版权-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/">Hexo博客-环境搭建</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 笑清 的个人博客">笑清</a></p>
+  <p><span>发布时间:</span>2021年11月02日 - 00:11</p>
+  <p><span>最后更新:</span>2024年09月10日 - 12:09</p>
+  <p><span>原始链接:</span><a href="/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/" title="Hexo博客-环境搭建">https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/</a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://tsubaki-01.github.io/2021/11/02/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/"  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"></a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+      
+</div>
+<!--版权-->
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Hexo-Building/" rel="tag"><i class="fa fa-tag"></i> Hexo Building</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/11/28/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA-github/" rel="next" title="Hexo博客-github repositories连接">
+      Hexo博客-github repositories连接 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-js%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">Node.js配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Node-js%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.1.1.</span> <span class="nav-text">Node.js下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Node-js%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.2.</span> <span class="nav-text">Node.js安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Node%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.3.</span> <span class="nav-text">Node环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cnpm%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.4.</span> <span class="nav-text">cnpm安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">Git配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Git%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.2.1.</span> <span class="nav-text">Git下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.2.</span> <span class="nav-text">Git安装</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="笑清"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">笑清</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tsubaki-01" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tsubaki-01" rel="noopener" target="_blank"><i class="fab fa-github-alt fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wengqiang9198@gmail.com" title="E-Mail → mailto:wengqiang9198@gmail.com" rel="noopener" target="_blank"><i class="far fa-paper-plane fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/images/VX.png" title="WeChat → &#x2F;images&#x2F;VX.png"><i class="fab fa-weixin fa-fw"></i>WeChat</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/images/QQ.jpg" title="QQ → &#x2F;images&#x2F;QQ.jpg"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">笑清</span>
+
+<!--修改-->
+
+<!--添加网站运行时间 -->
+<script type="text/javascript">
+    function show_site_runtime(){
+    window.setTimeout("show_site_runtime()",1000); // 每秒运行一次函数
+    X=new Date("10/23/2021 00:00:00"); //在这里修改你的建站时间
+    Y=new Date();
+    T=(Y.getTime()-X.getTime()); // 获取当前时间与指定时间之间的时间间隔（ms）    
+    i=24*60*60*1000;
+    d=T/i;
+    D=Math.floor(d); // 计算天数并向下取整
+    h=(d-D)*24;
+    H=Math.floor(h); // 计算剩余不足一天的小时数并向下取整
+    m=(h-H)*60;
+    M=Math.floor(m); // 计算剩余不足一小时的分钟数并向下取整
+    s=(m-M)*60
+    S=Math.floor(s); // 计算剩余不足一分钟的秒数并向下取整
+    site_runtime.innerHTML= D + " 天 " + H + " 小时 " + M + " 分 " + S + " 秒 "
+    }
+    show_site_runtime();
+</script>
+<p>>w< 本博客已诞生<span id="site_runtime" style="color: #24a0f0;"></span>>w<</p>
+<!--添加网站运行时间 -->
+
+
+
+<!--修改-->
+
+
+
+
+</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='57,42,66' opacity='1' zIndex='-1' count='77' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"position":"right","width":300,"height":600},"mobile":{"show":false},"rect":"opacity:0.7","log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
