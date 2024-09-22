@@ -27,15 +27,15 @@
 <meta property="og:site_name" content="My little blog">
 <meta property="og:description" content="写在前面最近换了主机，需要在多地同步更新blog，找到了办法，记录一下 需要使用到GitHub 原文地址">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tsubaki-01.github.io/2024/09/10/hello-world/image-20240912175916838.png">
-<meta property="og:image" content="https://tsubaki-01.github.io/2024/09/10/hello-world/33df90e6aa039695e8775455bead7e88.png">
+<meta property="og:image" content="https://tsubaki-01.github.io/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/image-20240912175916838.png">
+<meta property="og:image" content="https://tsubaki-01.github.io/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/33df90e6aa039695e8775455bead7e88.png">
 <meta property="article:published_time" content="2024-09-12T04:55:43.000Z">
 <meta property="article:modified_time" content="2024-09-12T10:31:19.982Z">
 <meta property="article:author" content="笑清">
 <meta property="article:tag" content="npm">
 <meta property="article:tag" content="hexo  Building">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tsubaki-01.github.io/2024/09/10/hello-world/image-20240912175916838.png">
+<meta name="twitter:image" content="https://tsubaki-01.github.io/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/image-20240912175916838.png">
 
 <link rel="canonical" href="https://tsubaki-01.github.io/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/">
 
@@ -239,7 +239,7 @@
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/K1052176873/article/details/122879462">原文地址</a></p>
 <span id="more"></span>
 
-<h2 id="1-hexo-blog目录结构"><a href="#1-hexo-blog目录结构" class="headerlink" title="1. hexo blog目录结构"></a>1. hexo blog目录结构</h2><p><img src="/2024/09/10/hello-world/image-20240912175916838.png" alt="image-20240912175916838"></p>
+<h2 id="1-hexo-blog目录结构"><a href="#1-hexo-blog目录结构" class="headerlink" title="1. hexo blog目录结构"></a>1. hexo blog目录结构</h2><p><img src="/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/image-20240912175916838.png" alt="image-20240912175916838"></p>
 <table>
 <thead>
 <tr>
@@ -301,7 +301,7 @@
 <p>因此每当我们执行<code>hexo d</code>的时候，<code>hexo</code>都会帮我们把生成好的静态页面文件推到<code>main</code>分支上。</p>
 <p>但是执行<code>hexo d</code> 对应的分支和默认分支是没有关系的，因为这是由配置文件决定的，配置文件写的哪个分支就是哪个分支。</p>
 <p>因此，<code>hexo</code>生成的静态博客文件默认放在<code>main</code>分支上。<code>hexo</code>的源文件（部署环境文件）可以都放在<code>src</code>分支上（可以新创建一个<code>src</code>分支）。然后把<code>src</code>分支设置成默认分支。有小伙伴可能会担心默认分支的改变会不会影响到原来的网页的正常显示，其实如果是用<code>GitHub Pages</code>对博客进行托管的话也很简单，第一次搭建博客默认使用main分支作为页面。在下图所示的设置里可以找到。如果不小心搞错了只要把分支设置成静态页面对应的分支就好了。</p>
-<p><img src="/2024/09/10/hello-world/33df90e6aa039695e8775455bead7e88.png" alt="img"></p>
+<p><img src="/2024/09/12/%E5%A4%9A%E4%B8%BB%E6%9C%BA%E5%90%8C%E6%AD%A5%E6%9B%B4%E6%96%B0blog/33df90e6aa039695e8775455bead7e88.png" alt="img"></p>
 <p>把<code>src</code>分支设置成默认分支，用来存放源文件，<code>main</code>分支依然存放静态文件。在老电脑上，我们需要把必要的源文件<code>push</code>到<code>src</code>分支。换新电脑时，直接<code>git clone</code> 仓库地址此时会从<code>src</code>分支下载源文件，剩下的就是安装<code>hexo</code>环境，在新电脑上就可以重新生成静态页面了，并且因为配置文件<code>clone</code>下来，<code>deploy</code>配置依旧是<code>main</code>分支，所以在新电脑上执行<code>hexo d</code>还是会把更新过后的静态文件推送到<code>main</code>分支上。</p>
 <p>由于<code>main</code>分支和<code>src</code>分支实际上是相互独立的两个普通的分支，所以我们源文件和静态页面的更新也是相互独立的，故而需要手动分别执行<code>git add .</code> <code>git commit</code> <code>git push</code>来更新源文件,然后执行<code>hexo d</code>更新静态页面。</p>
 <h2 id="3-同步操作"><a href="#3-同步操作" class="headerlink" title="3. 同步操作"></a>3. 同步操作</h2><h3 id="3-1-旧主机的操作"><a href="#3-1-旧主机的操作" class="headerlink" title="3.1 旧主机的操作"></a>3.1 旧主机的操作</h3><p>在<code>GitHub</code>对应的<code>repo</code>新建一个<code>src</code>分支，<code>clone</code>下来，并修剪文件结构，只留下上面提到的需要的文件和文件夹，并同步更新<code>.gitignore</code>。</p>
