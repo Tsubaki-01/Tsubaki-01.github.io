@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning How Materials Age: Reproducing Dynamic Appearance with Neural ODEs</title>
+
+<!-- 依赖 CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/atelier-dune.min.css" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+
+  --clr-paper:    #f9f7f3;   
+  --clr-paper-2:  #f2efe8;   
+  --clr-paper-3:  #ebe7dd;   
+  --clr-ink:      #282826;   
+  --clr-ink-2:    #504b45;   
+  --clr-ink-3:    #787066;  
+  --clr-accent:   #6b705c; 
+  --clr-accent-2: #8a907c;   
+  --clr-accent-3: #a5aa98;  
+  --clr-teal:     #586f7c;   
+  --clr-border:   #e0dcd0;   
+  --clr-border-2: #d0c9b8;   
+  --clr-code-bg:  #2c2c28; 
+  --clr-code-text:#e9e6dd;   
+
+
+  --font-serif:   'Crimson Pro', 'Georgia', serif;
+  --font-display: 'Playfair Display', 'Georgia', serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  --radius-sm:  8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-sm: 0 1px 4px rgba(80,60,30,.08), 0 2px 8px rgba(80,60,30,.04);
+  --shadow-md: 0 4px 16px rgba(80,60,30,.10), 0 2px 6px rgba(80,60,30,.06);
+
+  --trans-fast: 0.18s ease;
+  --trans-mid:  0.28s ease;
+
+  --sidebar-w:   240px;
+  --content-max: 780px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 17px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background-color: var(--clr-paper);
+  color: var(--clr-ink);
+  font-family: var(--font-serif);
+  line-height: 1.82;
+  min-height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--clr-paper-2); }
+::-webkit-scrollbar-thumb { background: var(--clr-accent-3); border-radius: 3px; }
+
+/* ===== Page layout ===== */
+.page-wrapper {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header  header"
+    "sidebar content"
+    "footer  footer";
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.site-header {
+  grid-area: header;
+  border-bottom: 1px solid var(--clr-border);
+  background: linear-gradient(180deg, var(--clr-paper) 0%, var(--clr-paper-2) 100%);
+  padding: 28px 40px 22px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.header-inner { display: flex; align-items: baseline; gap: 20px; }
+
+.site-logo {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--clr-accent);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.site-tagline {
+  font-size: 0.78rem;
+  color: var(--clr-ink-3);
+  font-style: italic;
+  border-left: 1px solid var(--clr-border-2);
+  padding-left: 16px;
+}
+
+/* ===== Sidebar TOC ===== */
+.sidebar {
+  grid-area: sidebar;
+  padding: 36px 20px 40px 32px;
+}
+
+.toc-wrapper {
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-accent-3) transparent;
+}
+
+.toc-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-ink-3);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--clr-border);
+  cursor: pointer;
+}
+
+.toc-list { list-style: none; padding: 0; }
+
+.toc-link {
+  display: block;
+  padding: 5px 10px 5px 12px;
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--clr-ink-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  transition: color var(--trans-fast), border-color var(--trans-fast), background var(--trans-fast), transform var(--trans-fast);
+}
+
+.toc-link:hover {
+  color: var(--clr-accent);
+  border-left-color: var(--clr-accent-2);
+  background: rgba(123,94,59,.06);
+  transform: translateX(3px);
+}
+
+.toc-link.active {
+  color: var(--clr-accent);
+  border-left-color: var(--clr-accent);
+  background: rgba(123,94,59,.09);
+  font-weight: 500;
+  transform: translateX(3px);
+}
+
+.toc-item--h2 > .toc-link { padding-left: 12px; font-size: 0.85rem; }
+.toc-item--h3 > .toc-link { padding-left: 24px; font-size: 0.77rem; color: var(--clr-ink-3); }
+
+/* ===== Main content ===== */
+.main-content {
+  grid-area: content;
+  padding: 48px 48px 80px 32px;
+  max-width: calc(var(--content-max) + 96px);
+  min-width: 0;
+}
+
+/* ===== Article hero ===== */
+.article-hero {
+  margin-bottom: 52px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.article-category {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--clr-accent);
+  background: rgba(123,94,59,.1);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.article-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.22;
+  color: var(--clr-ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+.article-byline {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--clr-ink-3);
+  margin-bottom: 10px;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--clr-ink-3);
+  margin-top: 18px;
+}
+
+.meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--clr-paper-2);
+  border: 1px solid var(--clr-border);
+  border-radius: 100px;
+  font-size: 0.68rem;
+  color: var(--clr-ink-2);
+}
+
+/* ===== Prose typography ===== */
+.prose p { margin-bottom: 1.35em; font-size: 1rem; hyphens: auto; }
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 2.2em 0 0.6em;
+  line-height: 1.3;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--clr-border);
+  color: var(--clr-ink);
+  scroll-margin-top: 96px;
+}
+
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 1.8em 0 0.5em;
+  color: var(--clr-accent);
+  scroll-margin-top: 96px;
+}
+
+.prose h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.4em 0 0.4em;
+  color: var(--clr-ink-2);
+  scroll-margin-top: 96px;
+}
+
+.prose strong { color: var(--clr-ink); font-weight: 600; }
+.prose em { font-style: italic; }
+
+/* ===== Blockquote ===== */
+.prose blockquote {
+  border-left: 3px solid var(--clr-accent-2);
+  background: var(--clr-paper-2);
+  padding: 16px 22px 16px 20px;
+  margin: 1.8em 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--clr-ink-2);
+  font-size: 0.97rem;
+}
+
+/* ===== Inline code ===== */
+.prose code:not(pre code) {
+  background: var(--clr-paper-3);
+  color: var(--clr-accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  border: 1px solid var(--clr-border);
+}
+
+/* ===== Code blocks ===== */
+.code-block-wrap {
+  position: relative;
+  margin: 1.8em 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e1a16;
+  padding: 10px 16px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #8a7f70;
+  border-bottom: 1px solid #3a342c;
+}
+
+.code-lang-badge {
+  color: var(--clr-accent-3);
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.copy-btn {
+  background: none;
+  border: 1px solid #3a342c;
+  color: #8a7f70;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  transition: all var(--trans-fast);
+}
+
+.copy-btn:hover { border-color: var(--clr-accent-3); color: var(--clr-accent-3); }
+
+.code-block-wrap pre {
+  margin: 0;
+  background: var(--clr-code-bg) !important;
+  border-radius: 0 !important;
+  padding: 18px 20px !important;
+  overflow-x: auto;
+  font-family: var(--font-mono) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.68 !important;
+}
+
+.code-block-wrap pre code {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  font-family: var(--font-mono) !important;
+  font-size: inherit !important;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.8em 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+.prose th {
+  background: var(--clr-paper-3);
+  color: var(--clr-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--clr-border-2);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.prose td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--clr-border);
+  color: var(--clr-ink-2);
+  vertical-align: top;
+}
+
+.prose tr:last-child td { border-bottom: none; }
+.prose tr:hover td { background: rgba(123,94,59,.04); }
+
+/* ===== Math ===== */
+.math-block {
+  margin: 1.8em 0;
+  padding: 18px 24px;
+  background: var(--clr-paper-2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  text-align: center;
+}
+
+.MathJax_Display { overflow-x: auto; overflow-y: hidden; }
+
+/* ===== Lists ===== */
+.prose ol, .prose ul {
+  margin: 1em 0 1.4em 1.6em;
+  padding: 0;
+}
+
+.prose li {
+  margin-bottom: 0.35em;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* ===== Horizontal rule ===== */
+.section-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--clr-border), transparent);
+  margin: 2.8em 0;
+}
+
+/* ===== Callout ===== */
+.callout {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  margin: 1.8em 0;
+  border: 1px solid;
+}
+
+.callout--info {
+  background: rgba(74,122,120,.07);
+  border-color: rgba(74,122,120,.25);
+}
+
+.callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+.callout-body {
+  font-size: 0.88rem;
+  line-height: 1.62;
+  color: var(--clr-ink-2);
+}
+
+.callout-body strong { color: var(--clr-ink); }
+
+/* ===== Figure caption ===== */
+.figure-caption {
+  font-size: 0.82rem;
+  color: var(--clr-ink-3);
+  font-style: italic;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 1.8em;
+  line-height: 1.5;
+  padding: 0 12px;
+}
+
+/* =====================================================================
+   媒体占位容器
+   Media placeholder containers — 后续直接在容器内嵌入 <img>/<video> 等标签
+   ===================================================================== */
+.media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+  background: var(--clr-paper-3);
+  border: 2px dashed var(--clr-border-2);
+  border-radius: var(--radius-md);
+  margin: 1.4em 0;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--trans-fast), background var(--trans-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.media-placeholder:hover {
+  border-color: var(--clr-accent-2);
+  background: var(--clr-paper-2);
+}
+
+/* 占位图标 */
+.media-placeholder::before {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  opacity: 0.45;
+  line-height: 1;
+}
+
+.media-placeholder[data-media-type="image"]::before  { content: "🖼"; }
+.media-placeholder[data-media-type="video"]::before  { content: "🎞"; }
+.media-placeholder[data-media-type="gif"]::before    { content: "▶"; }
+
+.media-placeholder-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--clr-ink-3);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.media-placeholder-label strong {
+  display: block;
+  color: var(--clr-ink-2);
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+
+/* 媒体实际容器（用于已有图片） */
+.media-container {
+  margin: 1.4em 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--clr-paper-3);
+  text-align: center;
+}
+
+.media-container img,
+.media-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.media-caption {
+  padding: 10px 16px 12px;
+  font-size: 0.78rem;
+  color: var(--clr-ink-3);
+  font-style: italic;
+  background: var(--clr-paper-2);
+  border-top: 1px solid var(--clr-border);
+  text-align: center;
+}
+
+/* ===== Image grid for frame sequences ===== */
+.frame-grid {
+  margin: 1.4em 0 0.5em;
+  overflow-x: auto;
+}
+
+.frame-grid table {
+  min-width: 100%;
+  font-size: 0.78rem;
+}
+
+.frame-grid th {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.7rem;
+  text-align: center !important;
+  padding: 8px 10px 6px !important;
+  white-space: nowrap;
+  background: var(--clr-paper-3) !important;
+  color: var(--clr-ink-2) !important;
+  border-bottom: 1px solid var(--clr-border-2) !important;
+}
+
+.frame-grid td {
+  padding: 8px 6px !important;
+  border-bottom: none !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* frame placeholder cells inside grid */
+.frame-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  min-height: 120px;
+  background: var(--clr-paper-3);
+  border: 1.5px dashed var(--clr-border-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--clr-ink-3);
+  text-align: center;
+  padding: 10px 6px;
+  line-height: 1.4;
+}
+
+.frame-cell .cell-icon { font-size: 1.4rem; margin-bottom: 5px; opacity: 0.4; }
+
+/* ===== References ===== */
+.references-list {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0;
+  counter-reset: ref-counter;
+}
+
+.references-list li {
+  padding: 7px 0 7px 34px;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--clr-ink-2);
+  position: relative;
+}
+
+.references-list li:last-child { border-bottom: none; }
+
+.ref-num {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--clr-accent);
+  font-weight: 500;
+}
+
+/* ===== Contributions ===== */
+.contributions-list {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0;
+}
+
+.contributions-list li {
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: var(--clr-paper-2);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--clr-accent-3);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--clr-ink-2);
+}
+
+.contributions-list li strong { color: var(--clr-accent); }
+
+/* ===== Back to top ===== */
+#back-to-top {
+  position: fixed;
+  right: 28px; bottom: 32px;
+  width: 42px; height: 42px;
+  background: var(--clr-accent);
+  color: var(--clr-paper);
+  border: none; border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0; pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity var(--trans-mid), transform var(--trans-mid);
+  z-index: 200;
+  font-size: 18px; line-height: 1;
+}
+
+#back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+#back-to-top:hover { background: var(--clr-accent-2); transform: translateY(-2px); }
+
+/* ===== Footer ===== */
+.site-footer {
+  grid-area: footer;
+  border-top: 1px solid var(--clr-border);
+  background: var(--clr-paper-2);
+  padding: 28px 40px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--clr-ink-3);
+  line-height: 1.8;
+}
+
+/* ===== Reveal animation ===== */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .page-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-areas: "header" "sidebar" "content" "footer";
+  }
+  .sidebar { padding: 16px 20px; border-bottom: 1px solid var(--clr-border); }
+  .toc-wrapper { position: static; max-height: none; }
+  .toc-list { display: none; }
+  .toc-list.open { display: block; }
+  .main-content { padding: 32px 20px 60px; }
+}
+
+@media (max-width: 600px) {
+  .article-title { font-size: 1.75rem; }
+  #back-to-top { right: 16px; bottom: 20px; }
+  .site-header { padding: 16px 20px; }
+  .frame-cell { width: 90px; min-height: 90px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+<!-- ===================================================================
+     Header
+     =================================================================== -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="#">◈ EE5311 · Group 25</a>
+    <span class="site-tagline">Neural ODEs &amp; Dynamic Appearance · CA1 Blog Report</span>
+  </div>
+</header>
+
+<!-- ===================================================================
+     Sidebar TOC
+     =================================================================== -->
+<aside class="sidebar" aria-label="Table of Contents">
+  <nav class="toc-wrapper">
+    <div class="toc-title" id="toc-toggle-btn">§ Contents</div>
+    <ul class="toc-list" id="toc-list">
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-intro">Introduction</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-background">Background</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-ndae">The NDAE Approach</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-formulation">Formulation</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-phases">Two Phases</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-architecture">Architecture</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-training">Online Training</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-loss">Loss Functions</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-brdf">BRDF Variant</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-reimpl">Our Reimplementation</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-arch-compare">Architecture Comparison</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-code-struct">Code Structure</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-impl-details">Key Details</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-results">Experimental Results</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-exemplar">Exemplar</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-warmup">Warm-up Phase</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-generation">Generation Phase</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-comparison">Side-by-side</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-cross">Cross-material</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-why">Why Some Work Better</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-quant">Quantitative</a></li>
+      <li class="toc-item toc-item--h3"><a class="toc-link" href="#sec-learned">What We Learned</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-limits">Limitations</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-conclusion">Conclusion</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-references">References</a></li>
+      <li class="toc-item toc-item--h2"><a class="toc-link" href="#sec-contributions">Contributions</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ===================================================================
+     Main Content
+     =================================================================== -->
+<main class="main-content">
+<article>
+
+  <!-- Article hero -->
+  <header class="article-hero">
+    <div class="article-category">Computer Vision · Neural ODEs · EE5311</div>
+    <h1 class="article-title">Learning How Materials Age: Reproducing Dynamic Appearance with Neural ODEs</h1>
+    <p class="article-byline"><em>By EE5311 CA1 Group 25</em></p>
+    <div class="article-meta">
+      <span class="meta-tag">◎ NDAE · Neural ODE · PyTorch</span>
+      <span class="meta-tag">◎ UCL · ACM Trans. Graph. 2024</span>
+    </div>
+  </header>
+
+  <div class="prose">
+
+    <!-- ================================================================
+         Introduction
+         ================================================================ -->
+    <section id="sec-intro" class="reveal">
+      <h2>Introduction</h2>
+      <p>
+        One thing we took away from EE5311 is that differential equations do more than sit in textbooks — they describe how things actually change over time, and if you make them differentiable you can fit them to real data with gradient descent. That got us wondering: could a neural network figure out the differential equations behind something like metal rusting, just by watching it happen in a video?
+      </p>
+      <p>
+        Turns out, someone already tried. <strong>Neural Differential Appearance Equations (NDAE)</strong> [1] by Chen Liu and Tobias Ritschel (UCL) does exactly this. They model how materials visually change over time — rusting, decaying, cracking, weathering — as the solution of a <strong>Neural ODE</strong> trained on a single exemplar video. What makes this different from standard dynamic texture work is that those methods mostly deal with <em>motion</em> (think flags waving or water rippling). Here, the appearance itself is what changes: colours shift, rust spots nucleate and spread, the whole texture transforms into something unrecognizable.
+      </p>
+      <p>
+        There is actually a nice historical thread here. Turing showed back in 1952 [6] that biological patterns can emerge from reaction-diffusion equations. NDAE takes the same spirit but swaps the hand-designed equations for a neural network that learns the dynamics directly from data, then rolls them forward to synthesize new texture videos.
+      </p>
+      <p>
+        In this blog we walk through the paper's main ideas, talk about our PyTorch reimplementation (and the corners we cut), show results on several materials, and discuss what worked and what did not.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Background
+         ================================================================ -->
+    <section id="sec-background" class="reveal">
+      <h2>Background: Why Not Just Optimize Frame by Frame?</h2>
+      <p>
+        The obvious baseline is: just run a texture synthesis method like Gatys et al.'s Gram-loss approach [2] on each video frame independently. We actually thought about this early on. The issue is <strong>temporal coherence</strong> — each frame might look fine on its own, but stitch them together and you get rust spots teleporting around, cracks blinking in and out. Nothing ties one frame to the next, so there is no reason the evolution should look smooth or physically plausible.
+      </p>
+      <p>
+        Two-stream [3] tries to get around this by separating appearance from motion using optical flow. The catch is it assumes the texture's statistics do not actually change over time — fine for swaying grass, useless when metal is actively turning into rust.
+      </p>
+      <p>
+        Other methods have similar problems. DyNCA [5] needs a pre-trained motion network and only handles textures whose look stays roughly constant. SinFusion [7] can train on a single video but is limited to short clips without much temporal variation. Bottom line: none of these can deal with the kind of drastic visual changes you see in real material aging.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         NDAE Approach
+         ================================================================ -->
+    <section id="sec-ndae" class="reveal">
+      <h2>The NDAE Approach</h2>
+
+      <h3 id="sec-formulation">Formulation: An ODE That Governs Appearance</h3>
+      <p>
+        NDAE's main idea is straightforward: model the changing appearance as the solution of a <strong>Neural ODE</strong>:
+      </p>
+
+      <div class="math-block">
+        $$\frac{d\mathbf{z}}{dt}(t) = f_\theta(\mathbf{z}(t), t)$$
+      </div>
+
+      <p>
+        Here \(\mathbf{z}(t) \in \mathbb{R}^{C \times H \times W}\) is a latent state at time \(t\), and \(f_\theta\) is a UNet parameterized by \(\theta\) that predicts the instantaneous rate of change. The latent state has \(C = 12\) channels — 3 for RGB appearance and 9 "augmented" channels that the network uses freely as hidden state.
+      </p>
+      <p>To generate appearance at any time \(t_N\), we:</p>
+      <ol>
+        <li>Start from random Gaussian noise \(\mathbf{z}(t_I) \sim \mathcal{N}(0, I)\)</li>
+        <li>Integrate the ODE forward: \(\mathbf{z}(t_N) = \mathbf{z}(t_I) + \int_{t_I}^{t_N} f_\theta(\mathbf{z}(t), t)\, dt\)</li>
+        <li>Extract the visible appearance from the first 3 channels: \(L(t) = \rho(\mathbf{z}(t))\)</li>
+      </ol>
+      <p>
+        If you have taken EE5311, this should look familiar — the state evolves via a differential equation, except now the equation itself is a neural network, and we learn its parameters by backpropagating through the entire forward simulation.
+      </p>
+
+      <h3 id="sec-phases">Two Phases: Warm-up and Generation</h3>
+      <p>The ODE simulation splits into two phases:</p>
+      <ul>
+        <li><strong>Warm-up</strong> \([t_I, t_S]\): The ODE converts random noise into a valid initial texture. Only the first exemplar frame supervises at \(t_S\). This is analogous to a "burn-in" period — the system organizes random initial state into a coherent pattern.</li>
+        <li><strong>Generation</strong> \([t_S, t_E]\): The ODE drives the texture forward, matching the evolving exemplar appearance. Each frame supervises at its corresponding time point.</li>
+      </ul>
+      <p>
+        The warm-up turns out to be really important. Without it, you would be asking the generation phase to start from noise, which obviously does not work well. With it, the same ODE weights learn to do two jobs: first denoise, then evolve.
+      </p>
+
+      <h3 id="sec-architecture">Architecture: UNet for Dynamics</h3>
+      <p>For \(f_\theta\) the authors use a <strong>UNet</strong> borrowed from the diffusion model literature [8]. The key design choices are:</p>
+      <ul>
+        <li>Encoder–decoder with skip connections (standard multi-scale stuff)</li>
+        <li><strong>Adaptive group normalization (AdaGN)</strong> conditioned on a sinusoidal time embedding — this is how the network knows what point in time it is at</li>
+        <li><strong>Self-attention</strong> at the lowest resolution for long-range spatial dependencies</li>
+        <li><strong>Circular padding</strong> everywhere, so the output tiles seamlessly</li>
+        <li>Sigmoid on the output to keep values in \([0, 1]\)</li>
+      </ul>
+
+      <h3 id="sec-training">Online Training Scheme (Algorithm 1)</h3>
+      <p>
+        A naive approach would integrate the full ODE from noise (\(t_I\)) to a random target (\(t_N\)) every single iteration, which is way too slow. The paper's solution is an <strong>online training scheme</strong> with a refresh rate \(R\):
+      </p>
+
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="code-lang-badge">Algorithm 1 (pseudocode)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code class="language-plaintext">For each cycle of R iterations:
+    Iteration 0: Sample noise z₀ at tI, solve ODE to tS, compute loss, update θ
+    Iteration k (k=1..R-1): 
+        Reuse last state as new starting point
+        Sample target in the k-th stratified range
+        Solve ODE for just this short segment
+        Compute loss, update θ
+    Refresh: start a new cycle from fresh noise</code></pre>
+      </div>
+
+      <p>
+        Because you reuse intermediate states instead of starting from scratch each time, the average integration cost drops by roughly \(R\times\). Setting \(R = 6\) brings training time down to something a single GPU can handle.
+      </p>
+
+      <h3 id="sec-loss">Loss Functions</h3>
+      <p>Training happens in two stages, both using VGG-19 features:</p>
+      <ul>
+        <li><strong>Init stage</strong>: Plain per-pixel MSE between the ODE output at \(t_S\) and the first exemplar frame. This just gets the model into the right ballpark — it can map noise to something that roughly looks like a texture.</li>
+        <li><strong>Local texture stage</strong>: Switches to <strong>Gram matrix loss</strong> + <strong>Sliced Wasserstein Distance (SWD)</strong>, which compare <em>texture statistics</em> instead of pixel-by-pixel matches. The idea is that a good rust texture should have the right colour distribution and feature correlations, not necessarily the exact same pixel layout as the exemplar. There is also an overflow penalty to keep pixel values from blowing up.</li>
+      </ul>
+
+      <h3 id="sec-brdf">BRDF Variant: Relightable Materials</h3>
+      <p>
+        The paper also has an extension for <strong>relightable</strong> materials, which we thought was pretty cool. The latent state grows to \(C = 9 + 9 = 18\) channels, where the first 9 are actual interpretable BRDF parameters:
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Channels</th>
+              <th>Parameter</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1–3</td><td>RGB diffuse albedo</td><td>Base color (Lambertian)</td></tr>
+            <tr><td>4–6</td><td>RGB specular albedo</td><td>Reflective tint</td></tr>
+            <tr><td>7–8</td><td>Anisotropic roughness</td><td>Surface micro-geometry</td></tr>
+            <tr><td>9</td><td>Height map</td><td>Normal perturbation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        These get fed into a <strong>differentiable Cook-Torrance renderer</strong> that can compute how the surface looks under any light/view direction. The training data is just flash-lit photos taken with a smartphone on a stand — no lab setup needed. All the known physics (GGX distribution, Fresnel, Smith geometry term) is hardcoded into the renderer; the network only has to learn the part we do not know, which is how the material properties change over time.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Reimplementation
+         ================================================================ -->
+    <section id="sec-reimpl" class="reveal">
+      <h2>Our Reimplementation: From JAX to PyTorch</h2>
+      <p>
+        We decided not to just clone the authors' repo and hit run. Instead we rewrote the whole thing in <strong>PyTorch from scratch</strong>. The original code is in JAX/Equinox, which is a pretty different ecosystem, so this was not a simple find-and-replace job — we had to actually understand what every piece does, from how the ODE wrapper talks to the solver down to the differentiable renderer.
+      </p>
+
+      <h3 id="sec-arch-compare">Architecture Comparison</h3>
+      <p>We simplified a few things to keep the project doable within our compute and time budget:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Original (JAX/Equinox)</th>
+              <th>Ours (PyTorch)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Framework</td><td>JAX + Equinox + Diffrax</td><td>PyTorch + torchdiffeq</td></tr>
+            <tr><td>UNet depth</td><td>3 levels</td><td><strong>2 levels</strong> (dim 32→64)</td></tr>
+            <tr><td>Self-attention</td><td>Yes (at lowest resolution)</td><td><strong>Removed</strong></td></tr>
+            <tr><td>ODE solver</td><td>Adaptive Heun (rtol/atol=1e-2)</td><td><strong>Euler</strong> (fixed step)</td></tr>
+            <tr><td>Parameters</td><td>~2.5M (estimated)</td><td><strong>~560K</strong></td></tr>
+            <tr><td>Training</td><td>Custom JAX training loop</td><td>PyTorch + ReduceLROnPlateau</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Why <strong>2 levels</strong> instead of 3? Honestly, the 3-level version was slow to train and kept going unstable on us. Two levels still give you multi-scale features, just with a smaller parameter count (~560K vs ~2.5M). We <strong>dropped self-attention</strong> because the \(O(n^2)\) memory cost was killing us at our training resolution — convolutions alone handle local patterns fine anyway. For the ODE solver, we went with <strong>Euler</strong> (fixed step) instead of adaptive Heun. Simpler, more predictable, but less accurate. The downside shows up when dynamics are "stiff" — if appearance changes happen abruptly, Euler's fixed steps can miss things and errors accumulate over long trajectories. You can partially compensate by using smaller steps, but that means more compute.
+      </p>
+
+      <h3 id="sec-code-struct">Code Structure</h3>
+      <p>We organized everything as a proper Python package:</p>
+
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="code-lang-badge">Directory tree</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code class="language-plaintext">ndae/src/ndae/
+├── models/
+│   ├── unet.py          # NDAEUNet: 2-level encoder-decoder with AdaGN
+│   ├── odefunc.py       # ODEFunction wrapper for torchdiffeq interface
+│   ├── blocks.py        # ConvBlock, DefaultConv2d (circular padding), Resample
+│   ├── time_embedding.py # SinusoidalTimeEmbedding + TimeMLP
+│   └── trajectory.py    # TrajectoryModel wrapping torchdiffeq.odeint
+├── training/
+│   ├── trainer.py       # Two-stage trainer (init MSE → local SWD)
+│   ├── schedule.py      # RefreshSchedule implementing Algorithm 1
+│   └── solver.py        # SolverConfig with Euler/adaptive Heun options
+├── losses/
+│   ├── objectives.py    # overflow_loss, init_loss, local_loss
+│   ├── swd.py           # Gram matrix loss + Sliced Wasserstein Distance
+│   └── perceptual.py    # VGG19Features (frozen, 5 blocks)
+├── rendering/
+│   ├── renderer.py      # Differentiable SVBRDF rendering pipeline
+│   └── brdf.py          # Cook-Torrance: GGX NDF, Smith G1, Fresnel Schlick
+└── data/
+    └── exemplar.py      # ExemplarDataset loading image sequences</code></pre>
+      </div>
+
+      <p>We wrote up documentation for every module on a <a href="https://ndae-doc-site" style="color:var(--clr-accent);">MkDocs site</a>.</p>
+
+      <h3 id="sec-impl-details">Key Implementation Details</h3>
+      <p>
+        <strong>AdaGN conditioning.</strong> Each <code>ConvBlock</code> gets a time embedding via Adaptive Group Normalization — a sinusoidal embedding goes through an MLP to produce per-channel scale and shift, which modulate the group norm statistics. Basically how the network knows what time step it is at.
+      </p>
+      <p>
+        <strong>Circular padding.</strong> We wrapped <code>nn.Conv2d</code> in a <code>DefaultConv2d</code> that calls <code>F.pad(..., mode='circular')</code> before every convolution. Without this the textures would have visible seams when tiled.
+      </p>
+      <p>
+        <strong>Two-stage training.</strong> The <code>Trainer</code> runs MSE loss for the first <code>n_init</code> iterations (init stage) to get a rough noise-to-texture mapping going, then switches to Gram + SWD on VGG-19 features (local stage) with gradient normalization so things do not explode.
+      </p>
+      <p>
+        <strong>Differentiable BRDF rendering.</strong> <code>brdf.py</code> has the full Cook-Torrance model — Lambertian diffuse, GGX NDF, Smith G1 shadowing (isotropic and anisotropic), Schlick Fresnel. Everything is differentiable so you can backprop through the renderer for the relightable variant.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Experimental Results
+         ================================================================ -->
+    <section id="sec-results" class="reveal">
+      <h2>Experimental Results</h2>
+      <p>
+        We chose to reproduce the <strong>rusting steel</strong> experiment from the paper's RGB dynamic texture results. This exemplar shows a steel plate gradually developing rust spots that grow and merge into a fully corroded surface — a clear case where appearance changes are not simple motion but a fundamental transformation of material properties.
+      </p>
+
+      <h3 id="sec-setup">Setup</h3>
+      <p>
+        We used our PyTorch reimplementation described above. The rusting steel exemplar consists of 100 frames at 128×128 resolution, with time parameters \(t_I = -1\), \(t_S = 0\), \(t_E = 5\).
+      </p>
+      <p>Key dependencies:</p>
+      <ul>
+        <li><strong>PyTorch</strong> — neural network framework</li>
+        <li><strong>torchdiffeq</strong> — ODE integration (Euler method)</li>
+        <li><strong>VGG-19</strong> (pretrained) — for computing perceptual texture statistics</li>
+      </ul>
+
+      <h3 id="sec-exemplar">Exemplar: the ground truth</h3>
+      <p>
+        The exemplar is a time-lapse recording of a steel plate rusting, processed into 100 frames. Below is one frame showing the plate in an intermediate state of corrosion:
+      </p>
+
+      <!-- Figure 1: Exemplar frame — images/exemplars_frame_00.png (900×708) -->
+      <div style="text-align:center; margin: 1.4em 0;">
+        <img
+          src="images/exemplars_frame_00.png"
+          alt="A frame from the exemplar time-lapse of a rusting steel plate"
+          loading="lazy"
+          style="max-width:420px; width:100%; height:auto; border-radius:var(--radius-md); box-shadow:var(--shadow-md); display:inline-block;"
+        >
+      </div>
+      <p class="figure-caption">
+        <em>Figure 1: A frame from the exemplar time-lapse of a rusting steel plate. The source video covers the full progression from clean metal to heavy corrosion.</em>
+      </p>
+
+      <h3 id="sec-warmup">Warm-up phase: from noise to steel</h3>
+      <p>
+        The synthesis output captures the warm-up phase — how the ODE transforms random Gaussian noise into a valid initial texture:
+      </p>
+
+      <!-- Figure 2: Warm-up phase frame sequence — images/synthesis_frame_000*.png (256×256 each) -->
+      <div class="frame-grid">
+        <table>
+          <thead>
+            <tr>
+              <th>Frame 0 (pure noise)</th>
+              <th>Frame 10</th>
+              <th>Frame 25</th>
+              <th>Frame 40</th>
+              <th>Frame 49 (end of warm-up)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img src="images/synthesis_frame_0000.png" alt="Synthesis frame 0000 — pure noise" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/synthesis_frame_0010.png" alt="Synthesis frame 0010" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/synthesis_frame_0025.png" alt="Synthesis frame 0025" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/synthesis_frame_0040.png" alt="Synthesis frame 0040" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/synthesis_frame_0049.png" alt="Synthesis frame 0049 — end of warm-up" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="figure-caption">
+        <em>Figure 2: The warm-up (denoising) phase. The ODE organizes random noise into a coherent metallic texture over 50 steps. By frame ~25, colour noise is mostly suppressed and a faint metallic structure begins to appear. By frame 49, a clean steel texture is ready for generation.</em>
+      </p>
+
+      <p>
+        The warm-up matters because the same ODE weights that later produce rusting also create the initial clean metal from noise. This dual capability — denoising and temporal evolution — learned by a single model is one of the paper's main contributions.
+      </p>
+
+      <h3 id="sec-generation">Generation phase: steel ages before your eyes</h3>
+      <p>
+        The transition output is the main result — the ODE driving the texture through a rusting process:
+      </p>
+
+      <!-- Figure 3: Generation phase frame sequence — images/transition_frame_00*.png (256×256 each) -->
+      <div class="frame-grid">
+        <table>
+          <thead>
+            <tr>
+              <th>Frame 0 (clean steel)</th>
+              <th>Frame 25</th>
+              <th>Frame 50</th>
+              <th>Frame 75</th>
+              <th>Frame 99 (heavy rust)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img src="images/transition_frame_0000.png" alt="Transition frame 0000 — clean steel" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/transition_frame_0025.png" alt="Transition frame 0025" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/transition_frame_0050.png" alt="Transition frame 0050" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/transition_frame_0075.png" alt="Transition frame 0075" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+              <td><img src="images/transition_frame_0099.png" alt="Transition frame 0099 — heavy rust" loading="lazy" style="width:120px;height:120px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="figure-caption">
+        <em>Figure 3: Generation phase. Small brown spots appear sparsely (frame 25), grow and multiply (frame 50), begin merging (frame 75), and form extensive corrosion by frame 99. The evolution is temporally smooth — no spots teleport or flicker.</em>
+      </p>
+
+      <p>
+        A few things to note. Rust spots grow continuously from small nucleation points, which mirrors real corrosion where oxidation starts at surface defects and spreads outward. The background drifts from silvery-white to beige. Early frames show isolated spots; later frames show merged, interconnected corrosion — consistent with the real physics of rust formation.
+      </p>
+
+      <h3 id="sec-comparison">Side-by-side comparison</h3>
+      <p>
+        The comparison frames place our ODE-generated texture alongside the original exemplar at corresponding time points:
+      </p>
+
+      <!-- Figure 4: Side-by-side stitched comparison — images/stitched_same_size_output_frame_00*.png
+           Original size: 1800×708 (2.54:1 wide — left=exemplar, right=synthesized) -->
+      <div style="margin: 1.4em 0;">
+        <div style="margin-bottom:14px;">
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Frame 50</p>
+          <img
+            src="images/stitched_same_size_output_frame_0050.png"
+            alt="Frame 50: Exemplar (left) vs. synthesized output (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-md);display:block;"
+          >
+        </div>
+        <div>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Frame 99</p>
+          <img
+            src="images/stitched_same_size_output_frame_0099.png"
+            alt="Frame 99: Exemplar (left) vs. synthesized output (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-md);display:block;"
+          >
+        </div>
+      </div>
+      <p class="figure-caption">
+        <em>Figure 4: Exemplar (upper) vs. synthesized output (lower) at two time points. The synthesized textures match the statistical properties — colour distribution, spot density, coverage ratio — while having different spatial arrangements, confirming generative diversity.</em>
+      </p>
+
+      <p>
+        The synthesized texture is intentionally different from the exemplar in spatial layout. The Gram/SWD loss matches statistics (colour histograms, feature correlations, spot size distributions), not pixel-level correspondence. The model is generative: it can produce many diverse rusting patterns that share the same statistical progression as the original.
+      </p>
+
+      <h3 id="sec-cross">Cross-material results</h3>
+      <p>
+        We also ran our simplified model on four additional exemplars from the paper's dataset. The results expose both strengths and clear limitations of our architectural choices.
+      </p>
+      <p>
+        <strong>Bacteria growth.</strong> The model gets the warm pinkish-beige palette of bacterial colonies right, and temporal densification — sparse early, denser later — matches real growth patterns. But distinct circular colony boundaries visible under a microscope are lost; generated frames blend more continuously without sharp outlines.
+      </p>
+      <p>
+        <strong>Cracking clay.</strong> Elongated darker regions cut through frames, and there is distinguishable colour zoning between intact clay and crack lines. The patterns do evolve over time. But generated cracks are softer and more diffuse than the originals — the sharp branching geometry of real clay cracks, where you can trace a line end-to-end, dissolves before completing.
+      </p>
+      <p>
+        <strong>Grassroots expansion.</strong> The colour identity is accurate, with fine filament-like streaks that suggest fibrous roots. The generated version carries a subtle vertical directional bias matching real root growth, and density increases over time. But individual traceable root strands are lost — they merge into a diffuse green haze rather than remaining discrete threads.
+      </p>
+      <p>
+        <strong>Sprouting seeds.</strong> The green-brown palette matches well, and the brightness progression — darker early, brighter and greener later — mirrors a real sprout emerging from soil. The soft, organic texture quality suits the subject. But no defined stem or leaf shapes emerge; the boundary between soil and sprout stays blurred.
+      </p>
+
+      <!-- Cross-material results — each image is a wide stitched pair (exemplar left, synthesized right)
+           output_1: 3840×1080 (Bacteria growth)
+           output_2: 3840×1080 (Cracking clay)
+           output_3: 2160×1080 (Grassroots expansion)
+           output_5: 2000×1080 (Sprouting seeds)
+           Displayed full-width, stacked vertically with labels -->
+      <div style="margin: 1.4em 0; display:flex; flex-direction:column; gap:20px;">
+
+        <div>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Bacteria growth</p>
+          <img
+            src="images/output_1_frame_050.png"
+            alt="Bacteria growth frame 050: exemplar (left) vs. synthesized (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);display:block;"
+          >
+        </div>
+
+        <div>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Cracking clay</p>
+          <img
+            src="images/output_2_frame_050.png"
+            alt="Cracking clay frame 050: exemplar (left) vs. synthesized (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);display:block;"
+          >
+        </div>
+
+        <div>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Grassroots expansion</p>
+          <img
+            src="images/output_3_frame_050.png"
+            alt="Grassroots expansion frame 050: exemplar (left) vs. synthesized (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);display:block;"
+          >
+        </div>
+
+        <div>
+          <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--clr-ink-3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Sprouting seeds</p>
+          <img
+            src="images/output_5_frame_050.png"
+            alt="Sprouting seeds frame 050: exemplar (left) vs. synthesized (right)"
+            loading="lazy"
+            style="width:100%;height:auto;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);display:block;"
+          >
+        </div>
+
+      </div>
+      <p class="figure-caption">
+        <em>Cross-material results at frame 050. Each image shows the exemplar (left half) alongside the synthesized output (right half). From top to bottom: Bacteria growth, Cracking clay, Grassroots expansion, Sprouting seeds.</em>
+      </p>
+
+      <h3 id="sec-why">Why do some materials work better than others?</h3>
+      <p>A pattern emerges across these five experiments, tied to our model design.</p>
+      <p>
+        <strong>Statistical losses are spatial-layout-blind.</strong> Our Gram matrix loss and SWD, both computed on VGG-19 features, are statistical losses. They match the overall distribution of textures and colours — what features are present and in what proportions — but are mostly indifferent to where those features sit. This explains why the model gets palette and texture identity right (grassroots, sprouts, and rust all look unmistakably like their subject matter) while consistently struggling with sharp structural boundaries. A crack running diagonally contributes the same Gram statistics whether it is correctly placed or smeared across the whole image.
+      </p>
+      <p>
+        <strong>Stationary vs. non-stationary textures.</strong> Grassroots, sprouts, and rust are near-stationary textures — the visual character is roughly uniform everywhere, with no strong foreground/background distinction. Gram/SWD losses are designed for this regime, which is why they work well here. Cracking clay is the outlier: cracks are sparse, linear, high-contrast features embedded in a uniform background. Capturing that requires getting specific spatial structure right, not just the statistical mixture. Bacteria sits between the two extremes, which matches its middling quality.
+      </p>
+      <p>
+        <strong>Limited receptive field from the 2-level UNet.</strong> With only two downsampling stages, the ODE function's receptive field is relatively small — it sees local patches well but cannot build a strong global picture. Even if the loss demanded correct crack placement, the architecture might lack the spatial reasoning to deliver it. The original 3-level UNet gives access to coarser, more global feature maps that support long-range structural coherence — important for crack propagation spanning the whole frame, less so for homogeneous textures like rust blooms.
+      </p>
+
+      <h3 id="sec-quant">Quantitative perspective</h3>
+      <p>The paper reports quantitative metrics averaged across all 22 RGB exemplars. Below are the numbers from Table 1:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Gram ↓</th>
+              <th>SWD ↓</th>
+              <th>Non-Straightness ↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Gatys (frame-wise)</td><td><strong>0.005</strong></td><td><strong>0.013</strong></td><td>2.050</td></tr>
+            <tr><td>Two-stream</td><td>0.006</td><td>0.015</td><td>1.777</td></tr>
+            <tr><td>DyNCA</td><td>3.216</td><td>1.924</td><td>1.499</td></tr>
+            <tr><td>SinFusion</td><td>4.372</td><td>1.900</td><td>1.749</td></tr>
+            <tr><td><strong>NDAE [1]</strong></td><td>0.042</td><td>0.050</td><td><strong>0.720</strong></td></tr>
+            <tr><td>Exemplar (reference)</td><td>—</td><td>—</td><td>1.531</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="figure-caption"><em>Table 1: Quantitative comparison from the paper. Lower is better for all metrics.</em></p>
+
+      <p>There is an interesting trade-off here:</p>
+      <p>
+        Realism (Gram, SWD): Frame-wise methods like Gatys achieve the best per-frame texture quality because each frame is independently optimized. NDAE is slightly behind but still competitive.
+      </p>
+      <p>
+        Temporal coherence (Non-Straightness): NDAE achieves 0.720, well below all other methods — and below the exemplar itself (1.531). The ODE's continuous dynamics smooth out the capturing artifacts (flashes, jitter) present in the real video, producing a more coherent trajectory through perceptual space than the ground truth.
+      </p>
+      <p>
+        This is the most noteworthy result in the table: the learned ODE produces smoother temporal evolution than reality, because the mathematical structure of an ODE inherently prevents discontinuous jumps.
+      </p>
+
+      <h3 id="sec-learned">What we learned</h3>
+      <p>
+        First, the warm-up phase is not optional. Without it, there is no mechanism to go from noise to a meaningful initial state. That a single ODE handles both denoising and temporal evolution is a clean design.
+      </p>
+      <p>
+        Second, Neural ODEs enforce temporal smoothness by construction. Because the state evolves continuously, sudden jumps or flickering between frames cannot happen. This is a structural prior that frame-by-frame methods lack.
+      </p>
+      <p>
+        Third, texture statistics are a reasonable supervision signal. Gram/SWD loss lets the model generate new spatial arrangements while matching the statistical properties of each time step. This is both a feature (diversity) and a limitation (some spatial structures may not be preserved).
+      </p>
+      <p>
+        Fourth, the online training scheme is necessary for tractability. Running the full ODE integration every iteration would be prohibitively slow. The stratified segment-based approach makes training feasible on a single GPU.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Limitations
+         ================================================================ -->
+    <section id="sec-limits" class="reveal">
+      <h2>Limitations and open questions</h2>
+      <p>
+        The ODE discovers latent dynamics purely from visual data. It does not model the actual chemistry of corrosion or biology of decay. Whether the learned latent space corresponds to meaningful physical quantities is an open question.
+      </p>
+      <p>
+        Each exemplar requires training a separate model from scratch. A universal model that generalizes across materials would be more useful but is considerably harder to build.
+      </p>
+      <p>
+        Training at 128×128 is practical, but scaling to higher resolutions increases ODE integration cost quadratically. The authors note that arbitrary-size synthesis is possible at inference time, but training remains resolution-constrained.
+      </p>
+      <p>
+        The method assumes uniform statistics across space. Materials with spatially localized processes (e.g., rust preferentially forming at edges) may not be well captured.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Conclusion
+         ================================================================ -->
+    <section id="sec-conclusion" class="reveal">
+      <h2>Conclusion</h2>
+      <p>
+        Neural Differential Appearance Equations formulate material aging as a Neural ODE and make the entire pipeline — from noise to appearance — differentiable. The method discovers "equations of aging" purely from video data. The learned ODE produces temporally coherent, visually plausible dynamic textures that outperform prior methods on materials with genuine appearance changes.
+      </p>
+      <p>
+        For EE5311 students, NDAE illustrates how differential equations, differentiable simulation, and physics-guided learning can be combined to solve problems in computer graphics. Our rusting steel reproduction shows the idea in action: from random noise, a single learned ODE produces a smooth, realistic portrayal of metal aging over time.
+      </p>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         References
+         ================================================================ -->
+    <section id="sec-references" class="reveal">
+      <h2>References</h2>
+      <ol class="references-list">
+        <li><span class="ref-num">[1]</span> C. Liu and T. Ritschel, "Neural Differential Appearance Equations," <em>ACM Trans. Graph.</em>, 2024. arXiv:2410.07128.</li>
+        <li><span class="ref-num">[2]</span> L. Gatys, A. Ecker, and M. Bethge, "Texture Synthesis Using Convolutional Neural Networks," <em>NeurIPS</em>, 2015.</li>
+        <li><span class="ref-num">[3]</span> T. Tesfaldet, M. Brubaker, and K. Derpanis, "Two-Stream Convolutional Networks for Dynamic Texture Synthesis," <em>CVPR</em>, 2018.</li>
+        <li><span class="ref-num">[4]</span> R. T. Q. Chen, Y. Rubanova, J. Bettencourt, and D. Duvenaud, "Neural Ordinary Differential Equations," <em>NeurIPS</em>, 2018.</li>
+        <li><span class="ref-num">[5]</span> E. Pajouheshgar, Y. Xu, T. Zhang, and S. Süsstrunk, "DyNCA: Real-time Dynamic Texture Synthesis Using Neural Cellular Automata," <em>CVPR</em>, 2023.</li>
+        <li><span class="ref-num">[6]</span> A. M. Turing, "The Chemical Basis of Morphogenesis," <em>Phil. Trans. R. Soc. Lond. B</em>, 1952.</li>
+        <li><span class="ref-num">[7]</span> Y. Nikankin, N. Haim, and M. Irani, "SinFusion: Training Diffusion Models on a Single Image or Video," <em>ICML</em>, 2023.</li>
+        <li><span class="ref-num">[8]</span> P. Dhariwal and A. Nichol, "Diffusion Models Beat GANs on Image Synthesis," <em>NeurIPS</em>, 2021.</li>
+      </ol>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ================================================================
+         Contributions
+         ================================================================ -->
+    <section id="sec-contributions" class="reveal">
+      <h2>Contributions</h2>
+      <ul class="contributions-list">
+        <li><strong>[Member A]</strong>: Literature review, paper analysis, wrote the Introduction and Background sections, proofread final draft.</li>
+        <li><strong>[Member B]</strong>: Implemented the reproduction pipeline, ran the rusting steel experiment, produced all synthesis outputs.</li>
+        <li><strong>[Member C]</strong>: Wrote the Core Idea and Training Algorithm sections, created diagrams and mathematical formulations.</li>
+        <li><strong>[Member D]</strong>: Wrote the Results, Limitations, and Conclusion sections, coordinated team efforts.</li>
+      </ul>
+      <p style="font-size:0.88rem; color:var(--clr-ink-3); font-style:italic; margin-top:0.8em;">
+        All members contributed to research discussions and review of the blog article.
+      </p>
+    </section>
+
+  </div><!-- /prose -->
+</article>
+</main>
+
+<!-- ===================================================================
+     Footer
+     =================================================================== -->
+<footer class="site-footer">
+  <div>
+    EE5311 CA1 · Group 25 · Neural Differential Appearance Equations<br>
+    <span style="opacity:.6;">Based on: Liu &amp; Ritschel, ACM Trans. Graph. 2024 · arXiv:2410.07128</span>
+  </div>
+</footer>
+
+</div><!-- /page-wrapper -->
+
+<!-- Back to top -->
+<button id="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ===================================================================
+     JavaScript
+     =================================================================== -->
+<script>
+/* 代码高亮 */
+document.addEventListener('DOMContentLoaded', () => { hljs.highlightAll(); });
+
+/* 复制代码 */
+function copyCode(btn) {
+  const pre = btn.closest('.code-block-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied ✓';
+    btn.style.color = '#7dba8a';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+  });
+}
+
+/* TOC 激活高亮 */
+const tocLinks = document.querySelectorAll('.toc-link');
+const sections = document.querySelectorAll('section[id]');
+
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => sectionObs.observe(s));
+
+/* 移动端 TOC 展开 */
+const tocBtn  = document.getElementById('toc-toggle-btn');
+const tocList = document.getElementById('toc-list');
+tocBtn.addEventListener('click', () => tocList.classList.toggle('open'));
+
+function handleResize() {
+  if (window.innerWidth > 900) tocList.classList.remove('open');
+  else tocList.classList.add('open');
+}
+handleResize();
+window.addEventListener('resize', handleResize);
+
+/* 返回顶部 */
+const backTop = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  backTop.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+
+/* 滚动入场动画 */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+<!-- MathJax -->
+<script>
+MathJax = {
+  tex: {
+    inlineMath:  [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+};
+</script>
+
+</body>
+</html>
