@@ -8,3 +8,4 @@
 @media(max-width:700px){.top-nav{gap:12px}.top-nav .nav-label{font-size:0}.top-nav .nav-label:after{content:attr(data-short);font-size:10px;margin-left:4px}.fortune-spot{display:none!important}}
 .notice-links{margin-left:auto;display:flex;gap:22px}.receipt-actions{justify-content:center}@media(max-width:700px){.notice-links{margin-left:53px;gap:20px}.notice-links .text-button{font-size:10px}}
 .dialog-notice{position:sticky;top:55px;z-index:4;margin:0;padding:10px 25px;background:#e5ecd6;color:#526e4c;border-bottom:1px solid #d5dfc3;font-size:11px;line-height:1.8}@media(max-width:700px){.dialog-notice{top:51px;padding:9px 18px;font-size:10px}}
+.receipt small{display:block}
