@@ -7,6 +7,10 @@
 
 {% block content %}
 
+  {% if page.current === 1 %}
+    {% include '_partials/side-quests.swig' %}
+  {% endif %}
+
   {%- for post in page.posts.toArray() %}
       {% if post.notshow != true %}
         {{ partial('_macro/post.swig', {post: post, is_index: true}) }}

@@ -117,6 +117,8 @@ menu:
   about: /about/ || fa fa-user
   tags: /tags/ || fa fa-tags
   categories: /categories/ || fa fa-th
+  两点半便利店: /night-store/ || fa fa-moon
+  Hot 100: /leetcode-hot-100/ || fa fa-code
   # archives: /archives/ || fa fa-archive
   # schedule: /schedule/ || fa fa-calendar
   # sitemap: /sitemap.xml || fa fa-sitemap
