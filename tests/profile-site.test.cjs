@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '../dist');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 
 test('profile contains the supplied education and internship without GPA', () => {
-  for (const text of ['新加坡国立大学', '华中科技大学', '优秀毕业生', '哔哩哔哩', '用户技术中心', 'AI 创作 Agent 开发', '上海', '2025.08', '2027.01', '2020.09', '2025.06', '2026.05', '2026.08']) assert.ok(html.includes(text), text);
+  for (const text of ['National University of Singapore', 'Huazhong University of Science and Technology', 'Outstanding Graduate', 'Bilibili', 'User Technology Center', 'AI Agent Development for Content Creation', 'Shanghai', '2025.08', '2027.01', '2020.09', '2025.06', '2026.05', '2026.08']) assert.ok(html.includes(text), text);
   assert.doesNotMatch(html, /GPA|4\.88|88\.2|20XX|Repository 0/);
 });
 
@@ -29,3 +29,4 @@ test('blog relocation preserves assets, special pages and old article URLs', () 
   assert.ok(redirects.length > 0);
   for (const file of redirects) assert.match(fs.readFileSync(path.join(root, '2024/09/12', file), 'utf8'), /location\.replace\("\/blog\/2024\/09\/12\//);
 });
+
