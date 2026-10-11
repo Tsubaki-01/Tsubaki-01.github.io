@@ -3,6 +3,8 @@ Thumbs.db
 db.json
 *.log
 node_modules/
+dist/
+_multiconfig.yml
 .deploy*/
 
 Boke_sucai/

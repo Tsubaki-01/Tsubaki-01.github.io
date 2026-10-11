@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "hexo generate",
+    "build": "node tools/build-site.cjs",
+    "build:blog": "hexo generate --config _config.yml,_config.blog.yml",
+    "test:site": "node --test tests/profile-site.test.cjs",
     "clean": "hexo clean",
-    "deploy": "hexo deploy",
+    "deploy": "node tools/deploy-site.cjs",
     "server": "hexo server"
   },
   "hexo": {

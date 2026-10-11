@@ -1,0 +1,11 @@
+# Build the existing Hexo blog beneath the profile homepage.
+url: https://tsubaki-01.github.io/blog
+root: /blog/
+public_dir: dist/blog
+theme_config:
+  menu:
+    home: index.html || fa fa-home
+    about: about/ || fa fa-user
+    tags: tags/ || fa fa-tags
+    categories: categories/ || fa fa-th
+    profile: https://tsubaki-01.github.io/ || fa fa-id-card
