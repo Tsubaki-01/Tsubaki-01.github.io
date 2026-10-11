@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="541.2" height="547.8" viewBox="0 0 541.2 547.8" fill="none" xmlns="http://www.w3.org/2000/svg">
+<ellipse id="Lavender wash" cx="270.6" cy="273.9" rx="270.6" ry="273.9" fill="url(#paint0_radial_0_33)"/>
+<defs>
+<radialGradient id="paint0_radial_0_33" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(270.6 273.9) scale(270.6 273.9)">
+<stop stop-color="#A68ABF" stop-opacity="0.279"/>
+<stop offset="0.3" stop-color="#B399CC" stop-opacity="0.1674"/>
+<stop offset="0.7" stop-color="#C2ADD4" stop-opacity="0.03348"/>
+<stop offset="1" stop-color="#C2ADD4" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>
